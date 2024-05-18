@@ -1,0 +1,18 @@
+/* src/Grid.css */
+.grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .row {
+    display: flex;
+  }
+  
+  .cell {
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ddd;
+  }
+  
