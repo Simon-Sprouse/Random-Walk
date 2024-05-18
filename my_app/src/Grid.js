@@ -1,58 +1,87 @@
 // src/Grid.js
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import Particle from './Particle';
 import './Grid.css';
 
 function Grid({ n }) {
+  const initialGridState = Array.from({ length: n }, () => Array(n).fill(-1));
 
-    const initialGridState = Array.from({ length: n }, () => Array(n).fill(-1));
-    const [gridState, setGridState] = useState(initialGridState);
+  const [gridState, setGridState] = useState(initialGridState);
+  const [particles, setParticles] = useState([]);
 
-    const createGrid = () => {
-        return gridState.map((row, rowIndex) => (
-        <div key={rowIndex} className="row">
-            {row.map((cell, colIndex) => (
-            <div
-                key={`${rowIndex}-${colIndex}`}
-                className={`cell ${cell === 1 ? 'on' : 'off'}`}
-                onClick={() => toggleCell(rowIndex, colIndex)}
-            ></div>
-            ))}
-        </div>
-        ));
-    };
+  const createGrid = () => {
+    return gridState.map((row, rowIndex) => (
+      <div key={rowIndex} className="row">
+        {row.map((cell, colIndex) => (
+          <div
+            key={`${rowIndex}-${colIndex}`}
+            className={`cell ${cell === 1 ? 'on' : 'off'}`}
+            onClick={() => addParticleAt(rowIndex, colIndex)}
+          ></div>
+        ))}
+      </div>
+    ));
+  };
 
 
-    const toggleCell = (rowIndex, colIndex) => {
+    const addParticleAt = (rowIndex, colIndex) => {
+        const newParticle = new Particle(rowIndex, colIndex, n);
+        setParticles([...particles, newParticle]);
 
-        const newGridState = gridState.map(row => [...row]);
-        newGridState[rowIndex][colIndex] = gridState[rowIndex][colIndex] === -1 ? 1 : -1;
+        const newGridState = gridState.map(row => row.map(cell => -1));
+        particles.forEach(particle => {
+        newGridState[particle.row][particle.col] = 1;
+        });
+        newGridState[rowIndex][colIndex] = 1;
         setGridState(newGridState);
     };
 
-
-    const resetGrid = () => {
-        const newState = Array.from({ length: n }, () => Array(n).fill(-1)); // Example: Turn all cells off
-        setGridState(newState);
+    // Function to add a particle at a random location
+    const addParticle = () => {
+        const rowIndex = Math.floor(Math.random() * n);
+        const colIndex = Math.floor(Math.random() * n);
+        addParticleAt(rowIndex, colIndex);
     };
 
-    const halfResetGrid = () => {
-        
-        const newState = Array.from({ length: n }, (_, rowIndex) =>
-          Array.from({ length: n }, (_, colIndex) =>
-            colIndex < n / 2 ? 1 : -1
-          )
-        );
+    const resetGrid = () => {
+        const newState = Array.from({ length: n }, () => Array(n).fill(-1));
         setGridState(newState);
-      };
+        setParticles([]);
+    };
+
+ 
+  const moveParticles = () => {
+    const newParticles = particles.map(particle => {
+      particle.move();
+      return particle;
+    });
 
 
-    return (
-        <div className="grid">
-            {createGrid()}
-            <button onClick={resetGrid}>Reset Grid</button>
-            <button onClick={halfResetGrid}>Half Reset Grid</button>
-        </div>
-    );
+    const newGridState = gridState.map(row => row.map(cell => -1));
+    newParticles.forEach(particle => {
+      newGridState[particle.row][particle.col] = 1;
+    });
+
+    // Update the grid state and particles
+    setGridState(newGridState);
+    setParticles(newParticles);
+  };
+
+  // Use effect to set up the interval for random movement
+  useEffect(() => {
+    const intervalId = setInterval(moveParticles, 100); // Move every 500ms
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [particles]);
+
+  return (
+    <div className="grid">
+      {createGrid()}
+      <button onClick={resetGrid}>Reset Grid</button>
+      <button onClick={addParticle}>Add a Particle</button>
+    </div>
+  );
 }
 
 export default Grid;
