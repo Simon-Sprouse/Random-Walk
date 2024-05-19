@@ -9,6 +9,7 @@ function Grid({ n }) {
 
   const [gridState, setGridState] = useState(initialGridState);
   const [particles, setParticles] = useState([]);
+  const [hue, setHue] = useState(Math.random());
 
   const createGrid = () => {
     return gridState.map((row, rowIndex) => (
@@ -31,7 +32,6 @@ function Grid({ n }) {
 
   // Function to add a particle at the specified position
   const addParticleAt = (rowIndex, colIndex) => {
-    const hue = Math.random(); // Random hue for each particle
     const newParticle = new Particle(rowIndex, colIndex, n, hue);
     setParticles([...particles, newParticle]);
   };
@@ -47,6 +47,7 @@ function Grid({ n }) {
     const newState = Array.from({ length: n }, () => Array(n).fill({ hue: 0, saturation: 0, value: 0 }));
     setGridState(newState);
     setParticles([]);
+    setHue(Math.random());
   };
 
  
@@ -60,7 +61,7 @@ function Grid({ n }) {
 
     // Create a new grid state with the particles moved and fading applied
     const newGridState = gridState.map(row => row.map(cell => {
-      return { ...cell, value: Math.max(cell.value - 0.01, 0) };
+      return { ...cell, value: Math.max(cell.value - 0.001, 0) };
     }));
 
     newParticles.forEach(particle => {
