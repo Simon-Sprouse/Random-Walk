@@ -14,7 +14,7 @@ class Particle {
         { dRow: 1, dCol: 0 },   // down
         { dRow: 0, dCol: -1 },  // left
         { dRow: 0, dCol: 1 },   // right
-        { dRow: 0, dCol: 0 }    // no movement
+        // { dRow: 0, dCol: 0 }    // no movement
       ];
   
       // Select a random direction
